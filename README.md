@@ -27,7 +27,7 @@ python scaffold.py
 - [x] **15.** iterative_policy_evaluation
 - [x] **16.** greedy_policy_improvement
 - [x] **17.** policy_iteration
-- [ ] **18.** value_iteration
+- [x] **18.** value_iteration
 - [ ] **19.** build_gambler_mdp
 - [ ] **20.** gambler_value_iteration
 - [ ] **21.** extract_optimal_stakes

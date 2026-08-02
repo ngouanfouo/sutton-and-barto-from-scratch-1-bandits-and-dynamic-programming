@@ -659,8 +659,58 @@ def policy_iteration(mdp: Dict[str, Any], gamma: float, theta: float) -> Tuple[n
         
     return state_values, policy
 
-# Step 18 - value_iteration (not yet solved)
-# TODO: implement
+# Step 18 - value_iteration
+import numpy as np
+from typing import Dict, Any, Tuple
+
+def value_iteration(mdp: Dict[str, Any], gamma: float, theta: float) -> Tuple[np.ndarray, np.ndarray]:
+    """Solve an MDP using Value Iteration and recover the optimal policy.
+
+    Args:
+        mdp (Dict[str, Any]): MDP dictionary containing n_states, n_actions, and P.
+        gamma (float): Discount factor in [0, 1].
+        theta (float): Convergence threshold factor > 0.
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: A tuple containing:
+            - state_values (np.ndarray): Optimal value function vector of shape (n_states,).
+            - policy (np.ndarray): Optimal deterministic policy array of shape (n_states,).
+    """
+    n_states = mdp['n_states']
+    n_actions = mdp['n_actions']
+    P = mdp['P']
+    
+    # Initialize the value state vector with zeros
+    state_values = np.zeros(n_states, dtype=float)
+    
+    while True:
+        delta = 0.0
+        
+        for s in range(n_states):
+            v_old = state_values[s]
+            
+            # Compute expected lookahead value for each action: q(s, a)
+            max_value = float('-inf')
+            for a in range(n_actions):
+                q_sa = 0.0
+                for prob, next_state, reward in P[s][a]:
+                    q_sa += prob * (reward + gamma * state_values[next_state])
+                
+                if q_sa > max_value:
+                    max_value = q_sa
+            
+            # Update value function with the maximum possible lookahead value
+            state_values[s] = max_value
+            delta = max(delta, abs(v_old - state_values[s]))
+            
+        # Terminate when the largest absolute value update drops below the tolerance
+        if delta < theta:
+            break
+            
+    # Recover the optimal deterministic policy from the converged value function
+    policy = greedy_policy_improvement(state_values, mdp, gamma)
+    
+    return state_values, policy
 
 # Step 19 - build_gambler_mdp (not yet solved)
 # TODO: implement
