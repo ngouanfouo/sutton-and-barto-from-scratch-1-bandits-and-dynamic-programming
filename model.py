@@ -260,8 +260,38 @@ def optimistic_initialization(k: int, initial_value: float) -> np.ndarray:
     # Create a pre-allocated array of shape (k,) initialized with the given starting value
     return np.full(shape=(k,), fill_value=float(initial_value), dtype=float)
 
-# Step 11 - ucb_action_select (not yet solved)
-# TODO: implement
+# Step 11 - ucb_action_select
+import numpy as np
+
+def ucb_action_select(q_values: np.ndarray, action_counts: np.ndarray, timestep: int, c: float) -> int:
+    """Select an action by upper-confidence-bound scores.
+
+    Args:
+        q_values (np.ndarray): Action-value estimates, shape (k,).
+        action_counts (np.ndarray): Visit counts per action, shape (k,).
+        timestep (int): Current time step t (>= 1).
+        c (float): Exploration constant.
+
+    Returns:
+        int: Index of the selected action.
+    """
+    k = len(q_values)
+    
+    # 1. Identify unvisited arms where N(a) == 0
+    unvisited_mask = (action_counts == 0)
+    
+    if np.any(unvisited_mask):
+        # Tie-break rule: Pick the smallest index among the unvisited arms
+        return int(np.argmax(unvisited_mask))
+        
+    # 2. Compute the UCB score for all arms since all N(a) > 0
+    # Score = Q(a) + c * sqrt(ln(t) / N(a))
+    ln_t = np.log(timestep)
+    variance_bounds = np.sqrt(ln_t / action_counts)
+    ucb_scores = q_values + c * variance_bounds
+    
+    # 3. Select the arm maximizing the score (np.argmax breaks ties by returning the first/smallest index)
+    return int(np.argmax(ucb_scores))
 
 # Step 12 - gradient_bandit_update (not yet solved)
 # TODO: implement
