@@ -22,7 +22,7 @@ python scaffold.py
 - [x] **10.** optimistic_initialization
 - [x] **11.** ucb_action_select
 - [x] **12.** gradient_bandit_update
-- [ ] **13.** bandit_parameter_study
+- [x] **13.** bandit_parameter_study
 - [ ] **14.** build_gridworld_mdp
 - [ ] **15.** iterative_policy_evaluation
 - [ ] **16.** greedy_policy_improvement

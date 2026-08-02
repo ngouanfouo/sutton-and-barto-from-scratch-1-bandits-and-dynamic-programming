@@ -337,8 +337,126 @@ def gradient_bandit_update(
     
     return updated_preferences
 
-# Step 13 - bandit_parameter_study (not yet solved)
-# TODO: implement
+# Step 13 - bandit_parameter_study
+import numpy as np
+from typing import List, Dict, Any
+
+def bandit_parameter_study(n_runs: int, n_steps: int, seed: int, settings: List[Dict[str, Any]]) -> Dict[str, float]:
+    """Compare multiple bandit strategies over independent runs and return final-step mean rewards.
+
+    Args:
+        n_runs (int): Number of independent runs to average over.
+        n_steps (int): Total number of pulling steps in each episode.
+        seed (int): Base random seed for reproducibility.
+        settings (List[Dict[str, Any]]): List of dicts specifying 'method', 'param', 
+                                         and optional 'nonstationary' (bool).
+
+    Returns:
+        Dict[str, float]: Maps configuration string label to its final step mean reward.
+    """
+    k = 10  # Standard 10-armed testbed setup
+    results = {}
+    
+    # Pre-generate true values across all runs to isolate policy differences from testbed variance
+    # Generate an explicit array of random seeds for each run to cleanly fork child streams
+    master_rng = np.random.default_rng(seed)
+    run_seeds = master_rng.integers(0, 2**32 - 1, size=n_runs)
+    
+    # Initialize baseline stationary true values for all independent testbeds upfront
+    base_true_values = np.zeros((n_runs, k))
+    for r_idx in range(n_runs):
+        run_rng = np.random.default_rng(run_seeds[r_idx])
+        base_true_values[r_idx] = run_rng.normal(0.0, 1.0, size=k)
+
+    for setting in settings:
+        method = setting['method']
+        param = setting['param']
+        nonstationary = setting.get('nonstationary', False)
+        
+        label = f"{method}({param})"
+        if nonstationary:
+            label += ",ns"
+            
+        run_rewards = np.zeros((n_runs, n_steps))
+        
+        for run in range(n_runs):
+            # Fork a distinct child RNG stream for action selection and reward noise
+            agent_rng = np.random.default_rng(run_seeds[run])
+            
+            # Setup initial arms values
+            if nonstationary:
+                true_values = np.zeros(k, dtype=float)
+            else:
+                true_values = base_true_values[run].copy()
+                
+            # Initialize agent value/preference matrices
+            q_values = np.zeros(k, dtype=float)
+            action_counts = np.zeros(k, dtype=int)
+            preferences = np.zeros(k, dtype=float)
+            running_average_reward = 0.0
+            
+            if method == 'optimistic':
+                q_values = np.full(k, fill_value=float(param), dtype=float)
+                
+            for step in range(1, n_steps + 1):
+                # Drift environment values if working under non-stationary regimes
+                if nonstationary and step > 1:
+                    true_values += agent_rng.normal(0.0, 0.01, size=k)
+                    
+                # --- Policy Action Selection ---
+                if method == 'epsilon_greedy':
+                    if agent_rng.random() < param:
+                        action = agent_rng.integers(0, k)
+                    else:
+                        action = int(np.argmax(q_values))
+                        
+                elif method == 'constant_step':
+                    if agent_rng.random() < 0.1:  # Fixed baseline exploration
+                        action = agent_rng.integers(0, k)
+                    else:
+                        action = int(np.argmax(q_values))
+                        
+                elif method == 'optimistic':
+                    action = int(np.argmax(q_values))
+                    
+                elif method == 'ucb':
+                    unvisited = (action_counts == 0)
+                    if np.any(unvisited):
+                        action = int(np.argmax(unvisited))
+                    else:
+                        ucb_scores = q_values + param * np.sqrt(np.log(step) / action_counts)
+                        action = int(np.argmax(ucb_scores))
+                        
+                elif method == 'gradient':
+                    shifted = preferences - np.max(preferences)
+                    exp_p = np.exp(shifted)
+                    policy = exp_p / np.sum(exp_p)
+                    action = agent_rng.choice(k, p=policy)
+                
+                # --- Step Performance & Feedback ---
+                reward = agent_rng.normal(true_values[action], 1.0)
+                run_rewards[run, step - 1] = reward
+                
+                # --- Value Matrix / Preference Updates ---
+                action_counts[action] += 1
+                
+                if method == 'epsilon_greedy' or method == 'ucb':
+                    alpha_n = 1.0 / action_counts[action]
+                    q_values[action] += alpha_n * (reward - q_values[action])
+                    
+                elif method == 'constant_step' or method == 'optimistic':
+                    alpha_step = param if method == 'constant_step' else 0.1
+                    q_values[action] += alpha_step * (reward - q_values[action])
+                    
+                elif method == 'gradient':
+                    running_average_reward += (reward - running_average_reward) / step
+                    adv = reward - running_average_reward
+                    preferences -= param * adv * policy
+                    preferences[action] += param * adv
+                    
+        results[label] = float(np.mean(run_rewards[:, -1]))
+        
+    return results
 
 # Step 14 - build_gridworld_mdp (not yet solved)
 # TODO: implement
