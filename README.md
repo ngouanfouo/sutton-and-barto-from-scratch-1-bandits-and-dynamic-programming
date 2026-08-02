@@ -18,7 +18,7 @@ python scaffold.py
 - [x] **6.** track_rewards_and_optimal_actions
 - [x] **7.** average_bandit_curves
 - [x] **8.** apply_random_walk_drift
-- [ ] **9.** constant_step_size_update
+- [x] **9.** constant_step_size_update
 - [ ] **10.** optimistic_initialization
 - [ ] **11.** ucb_action_select
 - [ ] **12.** gradient_bandit_update

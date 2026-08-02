@@ -221,8 +221,28 @@ def apply_random_walk_drift(true_values: np.ndarray, drift_std: float, rng: np.r
     # Return a new array with the independent random-walk step incorporated
     return true_values + noise
 
-# Step 9 - constant_step_size_update (not yet solved)
-# TODO: implement
+# Step 9 - constant_step_size_update
+import numpy as np
+
+def constant_step_size_update(q_values: np.ndarray, action: int, reward: float, alpha: float) -> np.ndarray:
+    """Apply the constant step-size update to the selected action.
+
+    Args:
+        q_values (np.ndarray): Shape (k,) current action-value estimates.
+        action (int): Index of the arm that was selected.
+        reward (float): Observed reward scalar.
+        alpha (float): Constant step-size parameter (learning rate) in (0, 1].
+
+    Returns:
+        np.ndarray: A new array of shape (k,) with the updated action-value estimates.
+    """
+    # Create a copy to prevent unintended side effects from mutating the original array
+    updated_q_values = q_values.copy().astype(float)
+    
+    # Q_{n+1} = Q_n + alpha * (R_n - Q_n)
+    updated_q_values[action] += alpha * (reward - updated_q_values[action])
+    
+    return updated_q_values
 
 # Step 10 - optimistic_initialization (not yet solved)
 # TODO: implement
