@@ -458,8 +458,67 @@ def bandit_parameter_study(n_runs: int, n_steps: int, seed: int, settings: List[
         
     return results
 
-# Step 14 - build_gridworld_mdp (not yet solved)
-# TODO: implement
+# Step 14 - build_gridworld_mdp
+from typing import Dict, List, Tuple, Any
+
+def build_gridworld_mdp() -> Dict[str, Any]:
+    """Construct the classic 4x4 Sutton & Barto gridworld as an MDP dynamics table.
+    
+    States are 0..15 in row-major order. States 0 and 15 are terminal sinks.
+    Actions: 0=North, 1=East, 2=South, 3=West.
+    
+    Returns:
+        Dict[str, Any]: A dictionary containing:
+            - 'n_states': int (16)
+            - 'n_actions': int (4)
+            - 'P': Dict[int, Dict[int, List[Tuple[float, int, float]]]]
+                   Mapping s -> a -> [(probability, next_state, reward)]
+    """
+    n_states = 16
+    n_actions = 4
+    
+    # Define action movements as coordinate updates: (delta_row, delta_col)
+    # 0 = North (row - 1), 1 = East (col + 1), 2 = South (row + 1), 3 = West (col - 1)
+    action_moves = {
+        0: (-1, 0),
+        1: (0, 1),
+        2: (1, 0),
+        3: (0, -1)
+    }
+    
+    P = {}
+    
+    for s in range(n_states):
+        P[s] = {}
+        
+        for a in range(n_actions):
+            # 1. Handle absorbing terminal states (0 and 15)
+            if s in (0, 15):
+                P[s][a] = [(1.0, s, 0.0)]
+                continue
+            
+            # 2. Map 1D state back to 2D grid dimensions (4x4)
+            r, c = s // 4, s % 4
+            dr, dc = action_moves[a]
+            
+            # Compute tentative target position
+            next_r = r + dr
+            next_c = c + dc
+            
+            # 3. Apply bounding walls check
+            if 0 <= next_r < 4 and 0 <= next_c < 4:
+                next_state = next_r * 4 + next_c
+            else:
+                next_state = s  # Bounce off the wall and remain in place
+                
+            # Every active transaction inside the gridworld incurs a step penalty of -1.0
+            P[s][a] = [(1.0, next_state, -1.0)]
+            
+    return {
+        "n_states": n_states,
+        "n_actions": n_actions,
+        "P": P
+    }
 
 # Step 15 - iterative_policy_evaluation (not yet solved)
 # TODO: implement
