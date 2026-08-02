@@ -12,7 +12,7 @@ python scaffold.py
 
 - [x] **1.** create_bandit_testbed
 - [x] **2.** pull_arm
-- [ ] **3.** sample_average_update
+- [x] **3.** sample_average_update
 - [ ] **4.** epsilon_greedy_action
 - [ ] **5.** run_bandit_episode
 - [ ] **6.** track_rewards_and_optimal_actions

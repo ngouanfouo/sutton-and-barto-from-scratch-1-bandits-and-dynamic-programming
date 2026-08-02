@@ -51,8 +51,35 @@ def pull_arm(true_values: np.ndarray, action: int, rng: np.random.Generator) -> 
     # Return the true value of the selected arm plus the stochastic noise
     return float(true_values[action] + noise)
 
-# Step 3 - sample_average_update (not yet solved)
-# TODO: implement
+# Step 3 - sample_average_update
+import numpy as np
+
+def sample_average_update(q_values: np.ndarray, action_counts: np.ndarray, action: int, reward: float) -> tuple:
+    """Update an action-value estimate incrementally from one new reward.
+
+    Args:
+        q_values (np.ndarray): Shape (k,) current action-value estimates.
+        action_counts (np.ndarray): Shape (k,) number of times each arm has been chosen.
+        action (int): Index of the arm that was selected.
+        reward (float): Observed reward scalar.
+
+    Returns:
+        tuple: (updated_q_values, updated_action_counts) as clean, independent copies.
+    """
+    # Create copies to prevent unexpected shared mutating side effects
+    updated_q_values = q_values.copy().astype(float)
+    updated_action_counts = action_counts.copy().astype(int)
+    
+    # Increment the visitation counter for the selected arm
+    updated_action_counts[action] += 1
+    
+    # Compute the incremental step size: alpha_n = 1 / N(a)
+    n = updated_action_counts[action]
+    
+    # Q_{n+1} = Q_n + (1 / n) * (R_n - Q_n)
+    updated_q_values[action] += (reward - updated_q_values[action]) / n
+    
+    return updated_q_values, updated_action_counts
 
 # Step 4 - epsilon_greedy_action (not yet solved)
 # TODO: implement
