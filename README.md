@@ -1,2 +1,37 @@
-# sutton-and-barto-from-scratch-1-bandits-and-dynamic-programming
+# Sutton and Barto from Scratch 1: Bandits and Dynamic Programming
+
 Implement core multi-armed bandit algorithms and dynamic-programming methods from Sutton and Barto. Build stationary and nonstationary bandit testbeds, compare epsilon-greedy, optimistic, UCB and gradient strategies, then solve gridworld and gambler MDPs with policy and value iteration.
+
+## How to run
+
+```bash
+python scaffold.py
+```
+
+## Steps
+
+- [x] **1.** create_bandit_testbed
+- [ ] **2.** pull_arm
+- [ ] **3.** sample_average_update
+- [ ] **4.** epsilon_greedy_action
+- [ ] **5.** run_bandit_episode
+- [ ] **6.** track_rewards_and_optimal_actions
+- [ ] **7.** average_bandit_curves
+- [ ] **8.** apply_random_walk_drift
+- [ ] **9.** constant_step_size_update
+- [ ] **10.** optimistic_initialization
+- [ ] **11.** ucb_action_select
+- [ ] **12.** gradient_bandit_update
+- [ ] **13.** bandit_parameter_study
+- [ ] **14.** build_gridworld_mdp
+- [ ] **15.** iterative_policy_evaluation
+- [ ] **16.** greedy_policy_improvement
+- [ ] **17.** policy_iteration
+- [ ] **18.** value_iteration
+- [ ] **19.** build_gambler_mdp
+- [ ] **20.** gambler_value_iteration
+- [ ] **21.** extract_optimal_stakes
+
+---
+
+Built on Deep-ML.
