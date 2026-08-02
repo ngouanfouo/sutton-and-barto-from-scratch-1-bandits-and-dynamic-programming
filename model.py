@@ -769,8 +769,69 @@ def build_gambler_mdp(goal: int, head_prob: float) -> Dict[str, Any]:
         'P': P
     }
 
-# Step 20 - gambler_value_iteration (not yet solved)
-# TODO: implement
+# Step 20 - gambler_value_iteration
+import numpy as np
+
+def gambler_value_iteration(goal: int, head_prob: float, theta: float, gamma: float = 1.0) -> np.ndarray:
+    """Solve the gambler's problem with value iteration.
+
+    Parameters
+    ----------
+    goal : int
+        Capital target (terminal winning state).
+    head_prob : float
+        Probability the coin lands heads.
+    theta : float
+        Stop when the largest value change in a sweep is below this.
+    gamma : float, optional
+        Discount factor (default 1.0).
+
+    Returns
+    -------
+    state_values : np.ndarray, shape (goal+1,)
+        Optimal values; state_values[0] and state_values[goal] are 0.
+    """
+    n_states = goal + 1
+    # Initialize all state values to 0.0, automatically securing terminal boundaries
+    state_values = np.zeros(n_states, dtype=float)
+    
+    while True:
+        delta = 0.0
+        
+        # Only sweep over non-terminal internal capital states: 1 to goal-1
+        for s in range(1, goal):
+            v_old = state_values[s]
+            
+            max_value = float('-inf')
+            max_stake = min(s, goal - s)
+            
+            # Evaluate the expected returns across all valid stakes for this state
+            for stake in range(1, max_stake + 1):
+                # Heads outcome transitions to s + stake
+                next_s_heads = s + stake
+                reward_heads = 1.0 if next_s_heads == goal else 0.0
+                q_heads = head_prob * (reward_heads + gamma * state_values[next_s_heads])
+                
+                # Tails outcome transitions to s - stake
+                next_s_tails = s - stake
+                q_tails = (1.0 - head_prob) * (0.0 + gamma * state_values[next_s_tails])
+                
+                q_stake = q_heads + q_tails
+                if q_stake > max_value:
+                    max_value = q_stake
+            
+            state_values[s] = max_value
+            delta = max(delta, abs(v_old - state_values[s]))
+            
+        # Terminate when the updates over the entire sweep drop below the convergence window
+        if delta < theta:
+            break
+            
+    # Guarantee explicit hard zero bounds for terminal states as required by spec
+    state_values[0] = 0.0
+    state_values[goal] = 0.0
+    
+    return state_values
 
 # Step 21 - extract_optimal_stakes (not yet solved)
 # TODO: implement
