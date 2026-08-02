@@ -165,8 +165,50 @@ def track_rewards_and_optimal_actions(true_values: np.ndarray, n_steps: int, eps
     
     return rewards, optimal_flags
 
-# Step 7 - average_bandit_curves (not yet solved)
-# TODO: implement
+# Step 7 - average_bandit_curves
+import numpy as np
+
+def average_bandit_curves(k: int, n_runs: int, n_steps: int, epsilon: float, seed: int) -> tuple:
+    """Average reward and optimal-action curves over many independent bandit runs.
+
+    Args:
+        k (int): Number of arms in the bandit environment.
+        n_runs (int): Number of independent simulation runs to average over.
+        n_steps (int): Number of time steps per run horizon.
+        epsilon (float): Exploration probability for epsilon-greedy selection.
+        seed (int): Base random seed value used for reproducibility.
+
+    Returns:
+        tuple: (mean_rewards, mean_optimal_fractions) each shape (n_steps,).
+    """
+    # Pre-allocate matrices to accumulate time-step vectors over all runs
+    all_rewards = np.zeros((n_runs, n_steps), dtype=float)
+    all_optimal_flags = np.zeros((n_runs, n_steps), dtype=float)
+    
+    for i in range(n_runs):
+        # Generate independent seeded components unique to this specific run
+        run_seed = seed + i
+        
+        # 1. Initialize the k-armed testbed distribution values
+        true_values = create_bandit_testbed(k, run_seed)
+        
+        # 2. Spawn an independent stochastic number generator for the episode
+        rng = np.random.default_rng(run_seed)
+        
+        # 3. Simulate the episode interaction trajectory
+        rewards, optimal_flags = track_rewards_and_optimal_actions(
+            true_values, n_steps, epsilon, rng
+        )
+        
+        # Store tracking histories
+        all_rewards[i] = rewards
+        all_optimal_flags[i] = optimal_flags
+        
+    # Aggregate data across the runs dimension (axis 0) to compute temporal averages
+    mean_rewards = np.mean(all_rewards, axis=0)
+    mean_optimal_fractions = np.mean(all_optimal_flags, axis=0)
+    
+    return mean_rewards, mean_optimal_fractions
 
 # Step 8 - apply_random_walk_drift (not yet solved)
 # TODO: implement

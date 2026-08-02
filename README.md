@@ -16,7 +16,7 @@ python scaffold.py
 - [x] **4.** epsilon_greedy_action
 - [x] **5.** run_bandit_episode
 - [x] **6.** track_rewards_and_optimal_actions
-- [ ] **7.** average_bandit_curves
+- [x] **7.** average_bandit_curves
 - [ ] **8.** apply_random_walk_drift
 - [ ] **9.** constant_step_size_update
 - [ ] **10.** optimistic_initialization
