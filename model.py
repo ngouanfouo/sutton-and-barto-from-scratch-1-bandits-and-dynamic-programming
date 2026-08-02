@@ -81,8 +81,21 @@ def sample_average_update(q_values: np.ndarray, action_counts: np.ndarray, actio
     
     return updated_q_values, updated_action_counts
 
-# Step 4 - epsilon_greedy_action (not yet solved)
-# TODO: implement
+# Step 4 - epsilon_greedy_action
+import numpy as np
+
+def epsilon_greedy_action(q_values: np.ndarray, epsilon: float, rng: np.random.Generator) -> int:
+
+    k = len(q_values)
+    
+    # Decide between exploration or exploitation
+    if rng.random() < epsilon:
+        # Exploration: choose a uniformly random action among all k arms
+        return int(rng.integers(0, k))
+    else:
+        # Exploitation: select the greedy action (breaking ties by picking the smallest index)
+        # np.argmax inherently returns the first (smallest) index matching the maximum value
+        return int(np.argmax(q_values))
 
 # Step 5 - run_bandit_episode (not yet solved)
 # TODO: implement
