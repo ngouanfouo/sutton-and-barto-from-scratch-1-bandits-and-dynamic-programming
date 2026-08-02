@@ -520,8 +520,68 @@ def build_gridworld_mdp() -> Dict[str, Any]:
         "P": P
     }
 
-# Step 15 - iterative_policy_evaluation (not yet solved)
-# TODO: implement
+# Step 15 - iterative_policy_evaluation
+import numpy as np
+from typing import Dict, Any
+
+def iterative_policy_evaluation(
+    policy: np.ndarray, 
+    mdp: Dict[str, Any], 
+    gamma: float, 
+    theta: float
+) -> np.ndarray:
+    """Compute the state-value function of a fixed policy using synchronous or 
+    in-place successive sweeps until maximum change falls below theta.
+
+    Args:
+        policy (np.ndarray): Shape (n_states,) containing deterministic action indices,
+                             OR shape (n_states, n_actions) containing action probabilities.
+        mdp (Dict[str, Any]): MDP table matching the structure of `build_gridworld_mdp`.
+        gamma (float): Discount factor in [0, 1].
+        theta (float): Convergence threshold factor > 0.
+
+    Returns:
+        np.ndarray: Converged state-value function vector of shape (n_states,).
+    """
+    n_states = mdp['n_states']
+    n_actions = mdp['n_actions']
+    P = mdp['P']
+    
+    # Initialize the value state vector with zeros
+    V = np.zeros(n_states, dtype=float)
+    
+    # Determine policy representation structure
+    is_deterministic = (policy.ndim == 1)
+    
+    while True:
+        delta = 0.0
+        
+        for s in range(n_states):
+            v_old = V[s]
+            v_new = 0.0
+            
+            if is_deterministic:
+                # Deterministic Policy: action is fixed for state s
+                a = int(policy[s])
+                # Expectation over transitions: sum_{s', r} p(s', r | s, a) * [r + gamma * V(s')]
+                for prob, next_state, reward in P[s][a]:
+                    v_new += prob * (reward + gamma * V[next_state])
+            else:
+                # Stochastic Policy: sum over actions and transitions
+                for a in range(n_actions):
+                    action_prob = policy[s, a]
+                    if action_prob > 0.0:
+                        for prob, next_state, reward in P[s][a]:
+                            v_new += action_prob * prob * (reward + gamma * V[next_state])
+            
+            V[s] = v_new
+            delta = max(delta, abs(v_old - v_new))
+            
+        # Terminate when the maximum value change over a full sweep is strictly less than theta
+        if delta < theta:
+            break
+            
+    return V
 
 # Step 16 - greedy_policy_improvement (not yet solved)
 # TODO: implement

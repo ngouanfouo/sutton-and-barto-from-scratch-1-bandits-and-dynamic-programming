@@ -24,7 +24,7 @@ python scaffold.py
 - [x] **12.** gradient_bandit_update
 - [x] **13.** bandit_parameter_study
 - [x] **14.** build_gridworld_mdp
-- [ ] **15.** iterative_policy_evaluation
+- [x] **15.** iterative_policy_evaluation
 - [ ] **16.** greedy_policy_improvement
 - [ ] **17.** policy_iteration
 - [ ] **18.** value_iteration
