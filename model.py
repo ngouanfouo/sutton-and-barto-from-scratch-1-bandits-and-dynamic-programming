@@ -583,8 +583,43 @@ def iterative_policy_evaluation(
             
     return V
 
-# Step 16 - greedy_policy_improvement (not yet solved)
-# TODO: implement
+# Step 16 - greedy_policy_improvement
+import numpy as np
+from typing import Dict, Any
+
+def greedy_policy_improvement(state_values: np.ndarray, mdp: Dict[str, Any], gamma: float) -> np.ndarray:
+    """Act greedily with respect to a given state-value function.
+
+    Args:
+        state_values (np.ndarray): Shape (n_states,) representing the current V(s).
+        mdp (Dict[str, Any]): MDP dictionary containing n_states, n_actions, and P.
+        gamma (float): Discount factor in [0, 1].
+
+    Returns:
+        np.ndarray: A 1-D array of shape (n_states,) containing the deterministic 
+                    greedy action index for each state. Ties break to smaller indices.
+    """
+    n_states = mdp['n_states']
+    n_actions = mdp['n_actions']
+    P = mdp['P']
+    
+    # Initialize a deterministic policy array
+    new_policy = np.zeros(n_states, dtype=int)
+    
+    for s in range(n_states):
+        # Array to store the action-value lookahead q(s, a) for all actions in state s
+        action_values = np.zeros(n_actions, dtype=float)
+        
+        for a in range(n_actions):
+            # Compute q(s, a) = sum_{s', r} p(s', r | s, a) * [r + gamma * V(s')]
+            for prob, next_state, reward in P[s][a]:
+                action_values[a] += prob * (reward + gamma * state_values[next_state])
+        
+        # Select the action maximizing the lookahead values.
+        # np.argmax automatically returns the first (smallest) index in the case of a tie.
+        new_policy[s] = int(np.argmax(action_values))
+        
+    return new_policy
 
 # Step 17 - policy_iteration (not yet solved)
 # TODO: implement
