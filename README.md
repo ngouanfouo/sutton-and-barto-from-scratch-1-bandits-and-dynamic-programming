@@ -30,7 +30,7 @@ python scaffold.py
 - [x] **18.** value_iteration
 - [x] **19.** build_gambler_mdp
 - [x] **20.** gambler_value_iteration
-- [ ] **21.** extract_optimal_stakes
+- [x] **21.** extract_optimal_stakes
 
 ---
 

@@ -833,6 +833,59 @@ def gambler_value_iteration(goal: int, head_prob: float, theta: float, gamma: fl
     
     return state_values
 
-# Step 21 - extract_optimal_stakes (not yet solved)
-# TODO: implement
+# Step 21 - extract_optimal_stakes
+import numpy as np
+
+def extract_optimal_stakes(state_values: np.ndarray, goal: int, head_prob: float, gamma: float = 1.0) -> np.ndarray:
+    """Extract the optimal stake for every capital level from V.
+
+    Parameters
+    ----------
+    state_values : np.ndarray, shape (goal + 1,)
+        Converged state values for capitals 0 .. goal.
+    goal : int
+        Capital target.
+    head_prob : float
+        Probability the coin lands heads.
+    gamma : float, optional
+        Discount factor (default 1.0).
+
+    Returns
+    -------
+    stakes : np.ndarray, shape (goal + 1,), dtype int
+        stakes[s] is an optimal stake for capital s (0 at terminals).
+        Ties are broken by choosing the smallest stake.
+    """
+    n_states = goal + 1
+    stakes = np.zeros(n_states, dtype=int)
+    
+    # Process only non-terminal internal capital states
+    for s in range(1, goal):
+        max_stake = min(s, goal - s)
+        
+        # Track the best action value found and the corresponding stake size
+        best_q = float('-inf')
+        best_stake = 1
+        
+        # Evaluate stakes sequentially from smallest to largest to preserve tie-breaking logic
+        for stake in range(1, max_stake + 1):
+            # Heads transition setup
+            next_s_heads = s + stake
+            reward_heads = 1.0 if next_s_heads == goal else 0.0
+            q_heads = head_prob * (reward_heads + gamma * state_values[next_s_heads])
+            
+            # Tails transition setup
+            next_s_tails = s - stake
+            q_tails = (1.0 - head_prob) * (0.0 + gamma * state_values[next_s_tails])
+            
+            q_stake = q_heads + q_tails
+            
+            # Use strict inequality (>) to maintain the smallest index on ties
+            if q_stake > best_q:
+                best_q = q_stake
+                best_stake = stake
+                
+        stakes[s] = best_stake
+        
+    return stakes
 
