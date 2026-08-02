@@ -11,7 +11,7 @@ python scaffold.py
 ## Steps
 
 - [x] **1.** create_bandit_testbed
-- [ ] **2.** pull_arm
+- [x] **2.** pull_arm
 - [ ] **3.** sample_average_update
 - [ ] **4.** epsilon_greedy_action
 - [ ] **5.** run_bandit_episode
