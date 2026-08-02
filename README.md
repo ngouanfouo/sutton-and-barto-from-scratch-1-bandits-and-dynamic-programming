@@ -21,7 +21,7 @@ python scaffold.py
 - [x] **9.** constant_step_size_update
 - [x] **10.** optimistic_initialization
 - [x] **11.** ucb_action_select
-- [ ] **12.** gradient_bandit_update
+- [x] **12.** gradient_bandit_update
 - [ ] **13.** bandit_parameter_study
 - [ ] **14.** build_gridworld_mdp
 - [ ] **15.** iterative_policy_evaluation

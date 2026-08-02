@@ -293,8 +293,49 @@ def ucb_action_select(q_values: np.ndarray, action_counts: np.ndarray, timestep:
     # 3. Select the arm maximizing the score (np.argmax breaks ties by returning the first/smallest index)
     return int(np.argmax(ucb_scores))
 
-# Step 12 - gradient_bandit_update (not yet solved)
-# TODO: implement
+# Step 12 - gradient_bandit_update
+import numpy as np
+
+def gradient_bandit_update(
+    preferences: np.ndarray, 
+    action: int, 
+    reward: float, 
+    average_reward: float, 
+    alpha: float
+) -> np.ndarray:
+    """Update softmax action preferences with one gradient-bandit step.
+
+    Args:
+        preferences (np.ndarray): Shape (k,) current action preferences H_t(a).
+        action (int): Index of the arm that was selected.
+        reward (float): Observed reward scalar R_t.
+        average_reward (float): Baseline average reward over time (scalar).
+        alpha (float): Step-size parameter (learning rate) > 0.
+
+    Returns:
+        np.ndarray: Updated preference vector of shape (k,).
+    """
+    # 1. Compute numerically stable softmax probabilities to get the policy
+    # Subtracting the maximum preference prevents floating-point overflow
+    shifted_prefs = preferences - np.max(preferences)
+    exp_prefs = np.exp(shifted_prefs)
+    policy = exp_prefs / np.sum(exp_prefs)
+    
+    # 2. Compute the baseline advantage signal
+    advantage = reward - average_reward
+    
+    # 3. Apply the gradient update step
+    # H_{t+1}(a) = H_t(a) - alpha * (R_t - baseline) * pi_t(a)  for all a != A_t
+    # H_{t+1}(A_t) = H_t(A_t) + alpha * (R_t - baseline) * (1 - pi_t(A_t))
+    updated_preferences = preferences.copy().astype(float)
+    
+    # Apply the general penalty/decay to all options based on their selection odds
+    updated_preferences -= alpha * advantage * policy
+    
+    # Offset the chosen action to match the targeted update indicator rule
+    updated_preferences[action] += alpha * advantage
+    
+    return updated_preferences
 
 # Step 13 - bandit_parameter_study (not yet solved)
 # TODO: implement
