@@ -244,8 +244,21 @@ def constant_step_size_update(q_values: np.ndarray, action: int, reward: float, 
     
     return updated_q_values
 
-# Step 10 - optimistic_initialization (not yet solved)
-# TODO: implement
+# Step 10 - optimistic_initialization
+import numpy as np
+
+def optimistic_initialization(k: int, initial_value: float) -> np.ndarray:
+    """Create starting action-value estimates that drive early exploration.
+
+    Args:
+        k (int): Number of arms in the bandit environment.
+        initial_value (float): The high, optimistic initial value for all estimates.
+
+    Returns:
+        np.ndarray: A 1-D array of shape (k,) filled with initial_value.
+    """
+    # Create a pre-allocated array of shape (k,) initialized with the given starting value
+    return np.full(shape=(k,), fill_value=float(initial_value), dtype=float)
 
 # Step 11 - ucb_action_select (not yet solved)
 # TODO: implement
