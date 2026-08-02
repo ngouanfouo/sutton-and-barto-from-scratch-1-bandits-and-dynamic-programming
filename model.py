@@ -210,8 +210,16 @@ def average_bandit_curves(k: int, n_runs: int, n_steps: int, epsilon: float, see
     
     return mean_rewards, mean_optimal_fractions
 
-# Step 8 - apply_random_walk_drift (not yet solved)
-# TODO: implement
+# Step 8 - apply_random_walk_drift
+import numpy as np
+
+def apply_random_walk_drift(true_values: np.ndarray, drift_std: float, rng: np.random.Generator) -> np.ndarray:
+
+    # Sample zero-mean normal noise matching the shape of the true action values
+    noise = rng.normal(loc=0.0, scale=drift_std, size=true_values.shape)
+    
+    # Return a new array with the independent random-walk step incorporated
+    return true_values + noise
 
 # Step 9 - constant_step_size_update (not yet solved)
 # TODO: implement
