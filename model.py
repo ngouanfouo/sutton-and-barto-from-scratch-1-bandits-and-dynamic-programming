@@ -712,8 +712,62 @@ def value_iteration(mdp: Dict[str, Any], gamma: float, theta: float) -> Tuple[np
     
     return state_values, policy
 
-# Step 19 - build_gambler_mdp (not yet solved)
-# TODO: implement
+# Step 19 - build_gambler_mdp
+from typing import Dict, Any, List, Tuple
+
+def build_gambler_mdp(goal: int, head_prob: float) -> Dict[str, Any]:
+    """Build the gambler's-problem MDP as a dynamics dictionary.
+
+    Parameters
+    ----------
+    goal : int
+        Capital target (terminal winning state).
+    head_prob : float
+        Probability that the coin lands heads.
+
+    Returns
+    -------
+    mdp : dict
+        Keys 'n_states', 'n_actions', and 'P' (dynamics table).
+    """
+    n_states = goal + 1
+    # The maximum possible actions any state can choose from is bounded by goal // 2
+    n_actions = goal 
+    
+    P: List[Any] = [[] for _ in range(n_states)]
+    
+    for s in range(n_states):
+        # Handle terminal boundaries (0 capital or reaching the goal)
+        if s == 0 or s == goal:
+            # Terminals have exactly one action (index 0) which is a self-loop
+            P[s] = [[(1.0, s, 0.0)]]
+            continue
+            
+        # Determine the maximum allowable stake for the current capital state
+        max_stake = min(s, goal - s)
+        
+        # Build transitions for each legal stake
+        for a in range(max_stake):
+            stake = a + 1
+            
+            # Heads outcome
+            next_state_heads = s + stake
+            reward_heads = 1.0 if next_state_heads == goal else 0.0
+            heads_tuple = (head_prob, next_state_heads, reward_heads)
+            
+            # Tails outcome
+            next_state_tails = s - stake
+            reward_tails = 0.0
+            tails_tuple = (1.0 - head_prob, next_state_tails, reward_tails)
+            
+            # Append in heads-then-tails order
+            P[s].append([heads_tuple, tails_tuple])
+            
+    return {
+        'n_states': n_states,
+        'n_actions': n_actions,
+        'P': P
+    }
 
 # Step 20 - gambler_value_iteration (not yet solved)
 # TODO: implement
