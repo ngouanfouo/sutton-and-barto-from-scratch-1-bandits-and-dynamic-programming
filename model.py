@@ -97,8 +97,46 @@ def epsilon_greedy_action(q_values: np.ndarray, epsilon: float, rng: np.random.G
         # np.argmax inherently returns the first (smallest) index matching the maximum value
         return int(np.argmax(q_values))
 
-# Step 5 - run_bandit_episode (not yet solved)
-# TODO: implement
+# Step 5 - run_bandit_episode
+import numpy as np
+
+def run_bandit_episode(true_values: np.ndarray, n_steps: int, epsilon: float, rng: np.random.Generator) -> tuple:
+    """Run one bandit episode with epsilon-greedy selection and sample-average updates.
+
+    Args:
+        true_values (np.ndarray): Shape (k,) true mean reward of each arm.
+        n_steps (int): Number of pulls in the episode.
+        epsilon (float): Exploration probability for epsilon-greedy.
+        rng (np.random.Generator): Seeded random generator.
+
+    Returns:
+        tuple: (rewards, actions) with shapes (n_steps,) and (n_steps,) of ints.
+    """
+    k = len(true_values)
+    
+    # Initialize tracking structures
+    q_values = np.zeros(k, dtype=float)
+    action_counts = np.zeros(k, dtype=int)
+    
+    # Pre-allocate output buffers
+    rewards_history = np.zeros(n_steps, dtype=float)
+    actions_history = np.zeros(n_steps, dtype=int)
+    
+    for t in range(n_steps):
+        # 1. Select arm epsilon-greedily based on current value estimates
+        action = epsilon_greedy_action(q_values, epsilon, rng)
+        
+        # 2. Execute pull to obtain stochastic reward
+        reward = pull_arm(true_values, action, rng)
+        
+        # 3. Apply sample-average incremental updates to value tracking matrices
+        q_values, action_counts = sample_average_update(q_values, action_counts, action, reward)
+        
+        # 4. Store current interaction records
+        actions_history[t] = action
+        rewards_history[t] = reward
+        
+    return rewards_history, actions_history
 
 # Step 6 - track_rewards_and_optimal_actions (not yet solved)
 # TODO: implement
