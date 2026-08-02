@@ -26,7 +26,7 @@ python scaffold.py
 - [x] **14.** build_gridworld_mdp
 - [x] **15.** iterative_policy_evaluation
 - [x] **16.** greedy_policy_improvement
-- [ ] **17.** policy_iteration
+- [x] **17.** policy_iteration
 - [ ] **18.** value_iteration
 - [ ] **19.** build_gambler_mdp
 - [ ] **20.** gambler_value_iteration

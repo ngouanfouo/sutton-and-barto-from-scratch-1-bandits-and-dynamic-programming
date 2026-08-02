@@ -621,8 +621,43 @@ def greedy_policy_improvement(state_values: np.ndarray, mdp: Dict[str, Any], gam
         
     return new_policy
 
-# Step 17 - policy_iteration (not yet solved)
-# TODO: implement
+# Step 17 - policy_iteration
+import numpy as np
+from typing import Dict, Any, Tuple
+
+def policy_iteration(mdp: Dict[str, Any], gamma: float, theta: float) -> Tuple[np.ndarray, np.ndarray]:
+    """Find the optimal policy and state-value function for a finite MDP using Policy Iteration.
+
+    Args:
+        mdp (Dict[str, Any]): MDP dictionary containing n_states, n_actions, and P.
+        gamma (float): Discount factor in [0, 1].
+        theta (float): Inner policy evaluation convergence threshold factor.
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: A tuple containing:
+            - state_values (np.ndarray): Optimal value function vector of shape (n_states,).
+            - policy (np.ndarray): Optimal deterministic policy array of shape (n_states,).
+    """
+    n_states = mdp['n_states']
+    
+    # 1. Initialize a baseline deterministic policy (e.g., all actions set to 0)
+    policy = np.zeros(n_states, dtype=int)
+    state_values = np.zeros(n_states, dtype=float)
+    
+    while True:
+        # 2. Policy Evaluation: Compute the value function for the current policy
+        state_values = iterative_policy_evaluation(policy, mdp, gamma, theta)
+        
+        # 3. Policy Improvement: Extract a greedy policy from the newly found value function
+        new_policy = greedy_policy_improvement(state_values, mdp, gamma)
+        
+        # 4. Check Policy Stability: If the policy does not change, it is optimal
+        if np.array_equal(policy, new_policy):
+            break
+            
+        policy = new_policy
+        
+    return state_values, policy
 
 # Step 18 - value_iteration (not yet solved)
 # TODO: implement
